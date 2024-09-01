@@ -1,0 +1,38 @@
+//All user-defined functions
+
+//Measuring observed heterozygosity
+function (lifso)Obs_het(lifso x){
+	pairHet = c();
+	for (m in c(0:(length(x)-1))){
+		pairHet = c(pairHet ,calcPairHeterozygosity(x[m].genome1,x[m].genome2));
+	}
+	return mean(pairHet);
+}
+
+//Measuring the number of segregating sites
+function (lifso) Seg_sites(lifso<Subpopulation> n){
+	return length(sim.mutationCounts(n));
+}
+
+//SLiM - segregating sites (from calcWattersonsTheta)
+function (lifso) Seg_sites_slim(lifso n){
+species = species = unique(n.individual.subpopulation.species, preserveOrder = F);
+muts = species.mutations;
+p = genomes.mutationFrequenciesInGenomes(muts);
+muts = muts[(p != 0.0) & (p != 1.0)];
+k = size(muts);
+return k
+}
+
+//Random trail codes
+
+inds = p1.individuals;
+catn(sum(inds[1].genomes.nucleotides()==inds[2].genomes.nucleotides()));
+catn("No. of Non-biallelic loci: " + (length(sim.mutations.position) - length(unique(sim.mutations.position))));
+alleleFreq = c();	
+catn(sim.mutationFrequencies(p1));
+
+//g = p1.individuals;
+//	for (i in g){
+//	print(length(i.uniqueMutations));
+//	}

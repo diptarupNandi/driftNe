@@ -1,0 +1,5 @@
+data <- read.table("output.txt", header = TRUE, sep = "\t")
+library(ggplot2)
+head(data)
+ggplot(data, aes(cycle,Expec_het)) + geom_point()
+ggplot(data, aes(cycle, Watt_theta)) + geom_point()
