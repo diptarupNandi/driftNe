@@ -1,0 +1,34 @@
+//Nucleotide based WF model 
+
+initialize() {
+	defineConstant("L", 1e6);
+	defineConstant("N", 10000);
+	initializeSLiMOptions(keepPedigrees = T, nucleotideBased=T); //pedigree imp for reproInds
+	initializeAncestralNucleotides(randomNucleotides(L)); //all inds, same genome at gen 1
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0); //neutral muts
+	initializeGenomicElementType("g1", m1, 1.0, mmJukesCantor(0.4e-8));
+	initializeGenomicElement(g1, 0, L-1);
+	initializeRecombinationRate(1e-8);
+}
+
+//Measuring the number of segregating sites
+function (lifso) Seg_sites(lifso<Subpopulation> n){
+	return length(sim.mutationCounts(n));
+}
+
+// Logging different parameters
+1 early() {
+	sim.addSubpop("p1", N);
+	log = community.createLogFile(
+	"C:/APU/Honors/SLiM_Output/Standardisation_runs-100k_gens/10k/log.txt", sep = "\t", logInterval = 10);
+	log.addCycle();
+	log.addCustomColumn("Heterozygosity", "calcHeterozygosity(p1.genomes);");
+	log.addCustomColumn("Watt_theta", "calcWattersonsTheta(p1.genomes);");	
+	log.addCustomColumn("Seg_sites", "Seg_sites(p1);");
+	log.addCustomColumn("ReproInds", "length(unique(p1.individuals.pedigreeParentIDs));");
+}
+
+
+100000 late() {
+	sim.outputFull("C:/APU/Honors/SLiM_Output/Standardisation_runs-100k_gens/10k/BurnIn.txt");
+}
