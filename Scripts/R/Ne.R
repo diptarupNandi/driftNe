@@ -1,21 +1,16 @@
 #Estimating Ne 
-
 library(ggplot2)
 library(tidyr)
+setwd("C:/APU/Honors/Data/Sexual_pops/10k/")
 
-setwd("C:/APU/Honors/SLiM_Output/Sexual_pops/1k/")
-
-N = 1000
+N = 10000
 mew4 = 4*1.2*10^-8
 theta = mew4 * N
 L = 10^6
+Sex_ratio = 0.9
 
 x = 'Generations'
-data <- read.table("log2.txt", header = TRUE, sep = "\t")
-
-Ne_H <- function(H){
-  return((H/(1-H)) * (1/mew4))
-} 
+data <- read.table("testLog0_9M.txt", header = TRUE, sep = "\t")
 
 reciprocal_sum = sum(1/(1:N))
 Seg_sites_expec = theta * reciprocal_sum * L
@@ -26,8 +21,10 @@ data$het_Ne <- Ne_H(data$Heterozygosity)
 data$theta_Ne <- data$Watt_theta/mew4 
 
 Ne_data <- data %>% pivot_longer(cols = c(het_Ne,theta_Ne,ReproInds),                              names_to = 'Ne', values_to = 'Values')
-ggplot(Ne_data, aes(cycle,Values, colour = Ne)) + geom_line() + geom_hline(yintercept = N, linetype = 'dashed') + labs(x="Generations", y="Ne") + ggtitle("Effective Population size")
 
+line.data <- data.frame(x=data$cycle,y=rep(Ne_sex(0.9),length(data$cycle)))
+
+ggplot(Ne_data, aes(cycle,Values, colour = Ne)) + geom_line() + geom_line(aes(x,y,color="Expected Ne"), data = line.data, linetype = "dashed") + labs(x="Generations", y="Ne") + ggtitle("Effective Population size") + geom_hline(yintercept = N, linetype = "dotted") + scale_color_manual(values = c('red4','green','navy','purple3'))
 #========================================================================
 #Plotting Heterozygosity
 

@@ -1,0 +1,27 @@
+// set up a simple neutral simulation
+initialize() {
+	initializeMutationRate(1e-7);
+	
+	// m1 mutation type: neutral
+	initializeMutationType("m1", 0.5, "f", 0.0);
+	
+	// g1 genomic element type: uses m1 for all mutations
+	initializeGenomicElementType("g1", m1, 1.0);
+	
+	// uniform chromosome of length 100 kb with uniform recombination
+	initializeGenomicElement(g1, 0, 99999);
+	initializeRecombinationRate(1e-8);
+}
+
+// create a population of 500 individuals
+1 early() {
+	sim.addSubpop("p1", 500);
+}
+
+2000 late() {sim.outputFull();
+	g = p1.genomes.countOfMutationsOfType(m1);
+	print(mean(g));
+	m = sim.mutationCounts(p1);
+	print(m);
+	print(length(m));
+}
