@@ -1,0 +1,48 @@
+initialize() {
+	defineConstant("L", 1e6);
+	defineConstant("N", 1000);
+	initializeSLiMOptions(keepPedigrees = T, nucleotideBased=T); //pedigree imp for reproInds
+	initializeAncestralNucleotides(randomNucleotides(L)); //all inds, same genome at gen 1
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0); //neutral muts
+	initializeGenomicElementType("g1", m1, 1.0, mmJukesCantor(0.4e-8));
+	initializeGenomicElement(g1, 0, L-1);
+	initializeRecombinationRate(1e-8);
+}
+
+function (lifso) Seg_sites(lifso<Subpopulation> n){
+	return length(sim.mutationCounts(n));
+}
+
+//SLiM - segregating sites (from calcWattersonsTheta)
+function (lifso) Seg_sites_slim(lifso n){
+species = unique(n.individual.subpopulation.species, preserveOrder = F);
+muts = species.mutations;
+p = genomes.mutationFrequenciesInGenomes(muts);
+muts = muts[(p != 0.0) & (p != 1.0)];
+k = size(muts);
+return k;
+}
+
+1 early(){sim.addSubpop('p1',N);}
+
+1000 late(){
+	print(Seg_sites(p1));
+	
+	muts = sim.mutations;
+	p = p1.genomes.mutationFrequenciesInGenomes(muts);
+	muts_seg = muts[(p != 0.0) & (p != 1.0)];
+	k = size(muts);
+
+	//print(sim.mutationCounts(p1));
+	print(length(muts));
+	print(length(muts_seg));	
+	//print(k);
+	//print(length(unique(muts)));
+	
+	//print(k);
+	//print(length(unique(muts)));
+	n = p1.genomes.size();
+	a_n = sum(1 / 1:(n-1));
+	theta = (k / a_n) / L;
+	//print(theta);
+}

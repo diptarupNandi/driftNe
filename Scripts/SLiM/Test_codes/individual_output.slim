@@ -1,0 +1,27 @@
+// Keywords: nucleotide-based, nucleotide sequence
+
+initialize() {
+	defineConstant("L", 100);
+	initializeSLiMOptions(nucleotideBased=T);
+	initializeAncestralNucleotides(randomNucleotides(L));
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+	initializeGenomicElementType("g1", m1, 1.0, mmJukesCantor(5e-5));
+	initializeGenomicElement(g1, 0, L-1);
+	initializeRecombinationRate(1e-8);
+}
+1 early() {	sim.addSubpop("p1", 10);
+}
+5000 late() {
+	g = p1.individuals;
+	//p = sample(g.nucleotides(format = 'integer'),5);
+	cat("Genome 1 of all individuals:");
+	//cat(g.genome1.nucleotides());
+	for(i in g){
+		cat("Genome 1 of ");
+		cat(i);
+		catn(i.genome1.nucleotides());
+		cat("Genome 2 of ");
+		cat(i);
+		catn(i.genome2.nucleotides());
+	}	
+}
