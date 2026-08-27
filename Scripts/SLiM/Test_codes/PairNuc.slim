@@ -1,0 +1,38 @@
+initialize() {
+	defineConstant("L", 1e6);
+	defineConstant("N", 100);
+	initializeSLiMOptions(keepPedigrees = T, nucleotideBased=T); //pedigree imp for reproInds
+	initializeAncestralNucleotides(randomNucleotides(L)); //all inds, same genome at gen 1
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0); //neutral muts
+	initializeGenomicElementType("g1", m1, 1.0, mmJukesCantor(0.4e-8));
+	initializeGenomicElement(g1, 0, L-1);
+	initializeRecombinationRate(1e-8);
+}
+
+function (integer) nCtwo(integer n){
+	return(asInteger((n*(n-1))/2));
+}
+
+function (integer) PairNuc(object<Genome> genome1, object<Genome> genome2){
+	gen1 = genome1.nucleotides(format = 'integer');
+	gen2 = genome2.nucleotides(format = 'integer');
+	return sum(gen1!=gen2);
+}
+	
+1 early(){sim.addSubpop('p1', N);}
+
+10000 late(){
+	pairNuc=c();
+	gens= sample(p1.genomes,25);
+	//print(length(gens));
+	for (i in 0:(length(gens) - 2)) {
+   	for (j in (i + 1):(length(gens)-1)) {
+			//if (j<length(gens))
+				combo = PairNuc(gens[i], gens[j]);
+				pairNuc=c(pairNuc,combo);
+	  }
+	}
+	//print(sample(pairNuc,10));
+	//print(length(pairNuc));
+	cat("Pi: " + mean(pairNuc));
+}

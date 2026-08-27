@@ -1,0 +1,31 @@
+initialize() {
+	defineConstant("L", 1e6);
+	initializeSLiMOptions(nucleotideBased=T);
+	initializeAncestralNucleotides(randomNucleotides(L));
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+	initializeGenomicElementType("g1", m1, 1.0, mmJukesCantor(0.4e-8));
+	initializeGenomicElement(g1, 0, L-1);
+	initializeRecombinationRate(1e-8);
+}
+
+function (lifso)Obs_het(lifso x){
+	pairHet = c();
+	for (m in c(0:(length(x)-1))){	
+	 pairHet = c(pairHet ,calcPairHeterozygosity(x[m].genome1,x[m].genome2));
+	}
+	return mean(pairHet);
+}
+
+function (lifso) Seg_sites(lifso<Subpopulation> n){
+	return length(sim.mutationCounts(n));
+}
+
+1 early() {	
+	sim.addSubpop("p1", 10000 );
+	log = community.createLogFile("burnIn.txt", sep = "\t", logInterval = 10);
+	log.addCycle();
+	log.addCustomColumn("Expec_Het", "calcHeterozygosity(p1.genomes);");
+	log.addCustomColumn("Watt_theta", "calcWattersonsTheta(p1.genomes);");	
+	log.addCustomColumn("Seg_sites", "Seg_sites(p1);");
+}
+10000 late() {sim.outputFull("full_out.txt");}

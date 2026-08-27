@@ -1,0 +1,33 @@
+//Nucleotide based WF model 
+// N to be defined when running the code
+
+initialize() {
+	defineConstant("L", 1e8); //genome size
+	initializeSLiMOptions(keepPedigrees = T, nucleotideBased=T); //pedigree imp for reproInds
+	initializeAncestralNucleotides(randomNucleotides(L)); //all individuals, same genome at 1st generation
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0); //neutral mutations
+	initializeGenomicElementType("g1", m1, 1.0, mmJukesCantor(0.4e-8)); //mmJukesCantor() defines mutation rates for each type of mutation (ref to SLiM manual)
+	initializeGenomicElement(g1, 0, L-1);
+	initializeRecombinationRate(1e-8);
+}
+
+//Measuring the number of segregating sites
+function (lifso) Seg_sites(lifso<Subpopulation> n){
+	return length(sim.mutationCounts(n)); //sim.mutationCounts gives us the counts of all the mutations. Length of that vec will give us the number of mutations. Assumes infinite sites model for the function to be true (probability of new mutation arising where an old mutation exists is very small)
+}
+
+// Logging different parameters
+1 early() {
+	sim.addSubpop("p1", N);
+	log = community.createLogFile(
+	paste0("pi_",N,".txt"), sep = "\t", logInterval = 10);
+	log.addCycle();
+	log.addCustomColumn("Heterozygosity", "calcHeterozygosity(p1.genomes);");
+	log.addCustomColumn("Watt_theta", "calcWattersonsTheta(p1.genomes);");	
+	log.addCustomColumn("Seg_sites", "Seg_sites(p1);");
+	log.addCustomColumn("Pi", "calcPi(p1.genomes);");
+	log.addCustomColumn("ReproInds", "length(unique(p1.individuals.pedigreeParentIDs));");
+}
+
+50000 late() {sim.simulationFinished();}
+//50000 late() {p1.genomes.outputVCF(paste0("wf_",N,".vcf"));}

@@ -1,0 +1,8 @@
+sumlst=c();
+for (i in 0:(length(my_list) - 1)) {
+  for (j in (i + 2):length(my_list)-1) {
+    combo = c(my_list[i], my_list[j]);
+	sumlst=c(sumlst,sum(combo));
+  }
+}
+print(sumlst);
